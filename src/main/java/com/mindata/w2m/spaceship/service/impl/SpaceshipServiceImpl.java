@@ -7,6 +7,8 @@ import com.mindata.w2m.spaceship.mapper.SpaceshipMapper;
 import com.mindata.w2m.spaceship.model.Spaceship;
 import com.mindata.w2m.spaceship.repository.SpaceshipRepository;
 import com.mindata.w2m.spaceship.service.SpaceshipService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+import static com.mindata.w2m.spaceship.constant.ConstantValues.SPACESHIP_CACHE;
 import static com.mindata.w2m.spaceship.constant.ErrorEnum.DUPLICATED_SPACESHIP;
 import static com.mindata.w2m.spaceship.constant.ErrorEnum.NOT_FOUND_BY_ID;
 
@@ -28,12 +31,14 @@ public class SpaceshipServiceImpl implements SpaceshipService {
     }
 
     @Override
+    @Cacheable(SPACESHIP_CACHE)
     public Page<SpaceshipResponseDTO> findAllSpaceships(Pageable pageable) {
         Page<Spaceship> spaceships = repository.findAll(pageable);
         return spaceships.map(spaceshipMapper::spaceshipToSpaceshipResponseDto);
     }
 
     @Override
+    @Cacheable(SPACESHIP_CACHE)
     public SpaceshipResponseDTO findSpaceshipById(Long id) {
         Optional<Spaceship> spaceship = repository.findById(id);
         return spaceshipMapper.spaceshipToSpaceshipResponseDto(spaceship.orElseThrow(() ->
@@ -42,12 +47,14 @@ public class SpaceshipServiceImpl implements SpaceshipService {
     }
 
     @Override
+    @Cacheable(SPACESHIP_CACHE)
     public Page<SpaceshipResponseDTO> findSpaceshipsByNamePart(String namePart, Pageable pageable) {
         Page<Spaceship> spaceships = repository.findBySpaceshipNameContainingIgnoreCase(namePart, pageable);
         return spaceships.map(spaceshipMapper::spaceshipToSpaceshipResponseDto);
     }
 
     @Override
+    @CacheEvict(value = SPACESHIP_CACHE, allEntries = true)
     public SpaceshipResponseDTO saveSpaceship(SpaceshipRequestDTO requestDTO) {
         Spaceship spaceship = spaceshipMapper.spaceshipRequestDtoTOSpaceship(requestDTO);
         try {
@@ -61,6 +68,7 @@ public class SpaceshipServiceImpl implements SpaceshipService {
     }
 
     @Override
+    @CacheEvict(value = SPACESHIP_CACHE, allEntries = true)
     public SpaceshipResponseDTO updateSpaceship(Long id, SpaceshipRequestDTO requestDTO) {
         Spaceship spaceship = repository.findById(id).orElseThrow(() ->
                 new SpaceshipNotFoundException(NOT_FOUND_BY_ID.getCode(),
@@ -79,10 +87,12 @@ public class SpaceshipServiceImpl implements SpaceshipService {
     }
 
     @Override
+    @CacheEvict(value = SPACESHIP_CACHE, allEntries = true)
     public void deleteSpaceshipById(Long id) {
         if (!repository.existsById(id))
             throw new SpaceshipNotFoundException(NOT_FOUND_BY_ID.getCode(),
                     String.format(NOT_FOUND_BY_ID.getDescription(), id));
         repository.deleteById(id);
     }
+
 }
