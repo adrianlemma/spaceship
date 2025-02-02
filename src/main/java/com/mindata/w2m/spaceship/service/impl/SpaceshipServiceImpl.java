@@ -7,19 +7,21 @@ import com.mindata.w2m.spaceship.mapper.SpaceshipMapper;
 import com.mindata.w2m.spaceship.model.Spaceship;
 import com.mindata.w2m.spaceship.repository.SpaceshipRepository;
 import com.mindata.w2m.spaceship.service.SpaceshipService;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+import static com.mindata.w2m.spaceship.constant.ErrorEnum.DUPLICATED_SPACESHIP;
 import static com.mindata.w2m.spaceship.constant.ErrorEnum.NOT_FOUND_BY_ID;
 
 @Service
 public class SpaceshipServiceImpl implements SpaceshipService {
 
     private final SpaceshipRepository repository;
-    private SpaceshipMapper spaceshipMapper = SpaceshipMapper.INSTANCE;
+    private final SpaceshipMapper spaceshipMapper = SpaceshipMapper.INSTANCE;
 
     public SpaceshipServiceImpl(SpaceshipRepository repository, SpaceshipMapper spaceshipMapper) {
         this.repository = repository;
@@ -48,8 +50,14 @@ public class SpaceshipServiceImpl implements SpaceshipService {
     @Override
     public SpaceshipResponseDTO saveSpaceship(SpaceshipRequestDTO requestDTO) {
         Spaceship spaceship = spaceshipMapper.spaceshipRequestDtoTOSpaceship(requestDTO);
-        spaceship = repository.save(spaceship);
-        return spaceshipMapper.spaceshipToSpaceshipResponseDto(spaceship);
+        try {
+            spaceship = repository.save(spaceship);
+            return spaceshipMapper.spaceshipToSpaceshipResponseDto(spaceship);
+        } catch (DataIntegrityViolationException ex) {
+            throw new SpaceshipNotFoundException(DUPLICATED_SPACESHIP.getCode(),
+                    String.format(DUPLICATED_SPACESHIP.getDescription(),
+                            spaceship.getSpaceshipName(), spaceship.getTvProgram()));
+        }
     }
 
     @Override
@@ -60,8 +68,14 @@ public class SpaceshipServiceImpl implements SpaceshipService {
         spaceship.setSpaceshipName(requestDTO.getSpaceshipName());
         spaceship.setTvProgram(requestDTO.getTvProgram());
         spaceship.setCapacity(requestDTO.getCapacity());
-        spaceship = repository.save(spaceship);
-        return spaceshipMapper.spaceshipToSpaceshipResponseDto(spaceship);
+        try {
+            spaceship = repository.save(spaceship);
+            return spaceshipMapper.spaceshipToSpaceshipResponseDto(spaceship);
+        } catch (DataIntegrityViolationException ex) {
+            throw new SpaceshipNotFoundException(DUPLICATED_SPACESHIP.getCode(),
+                    String.format(DUPLICATED_SPACESHIP.getDescription(),
+                            spaceship.getSpaceshipName(), spaceship.getTvProgram()));
+        }
     }
 
     @Override
