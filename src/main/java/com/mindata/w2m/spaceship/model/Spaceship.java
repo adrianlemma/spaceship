@@ -30,7 +30,7 @@ public class Spaceship {
     @PrePersist
     @PreUpdate
     public void updateLastUpdate() {
-        this.lastUpdate = LocalDateTime.now();
+        setLastUpdate(LocalDateTime.now());
     }
 
     public Long getId() {

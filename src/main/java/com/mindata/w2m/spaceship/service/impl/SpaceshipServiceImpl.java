@@ -2,6 +2,7 @@ package com.mindata.w2m.spaceship.service.impl;
 
 import com.mindata.w2m.spaceship.dto.SpaceshipRequestDTO;
 import com.mindata.w2m.spaceship.dto.SpaceshipResponseDTO;
+import com.mindata.w2m.spaceship.exception.SpaceshipDuplicatedException;
 import com.mindata.w2m.spaceship.exception.SpaceshipNotFoundException;
 import com.mindata.w2m.spaceship.mapper.SpaceshipMapper;
 import com.mindata.w2m.spaceship.model.Spaceship;
@@ -61,7 +62,7 @@ public class SpaceshipServiceImpl implements SpaceshipService {
             spaceship = repository.save(spaceship);
             return spaceshipMapper.spaceshipToSpaceshipResponseDto(spaceship);
         } catch (DataIntegrityViolationException ex) {
-            throw new SpaceshipNotFoundException(DUPLICATED_SPACESHIP.getCode(),
+            throw new SpaceshipDuplicatedException(DUPLICATED_SPACESHIP.getCode(),
                     String.format(DUPLICATED_SPACESHIP.getDescription(),
                             spaceship.getSpaceshipName(), spaceship.getTvProgram()));
         }

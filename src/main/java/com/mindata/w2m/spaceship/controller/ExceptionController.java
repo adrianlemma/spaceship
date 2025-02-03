@@ -8,12 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.mindata.w2m.spaceship.constant.ErrorEnum.FIELD_VALIDATION;
-import static com.mindata.w2m.spaceship.constant.ErrorEnum.GENERIC_EXCEPTION;
+import static com.mindata.w2m.spaceship.constant.ErrorEnum.*;
 
 @RestControllerAdvice
 public class ExceptionController {
@@ -37,6 +37,13 @@ public class ExceptionController {
                 errorMessage.add(error.getDefaultMessage()));
         SpaceshipErrorDTO errorDTO = new SpaceshipErrorDTO(FIELD_VALIDATION.getCode(),
                 String.format(FIELD_VALIDATION.getDescription(), errorMessage));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDTO);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<SpaceshipErrorDTO> methodArgumentTypeMismatchExceptionHandler(MethodArgumentTypeMismatchException ex) {
+        SpaceshipErrorDTO errorDTO = new SpaceshipErrorDTO(INVALID_VARIABLE.getCode(),
+                String.format(INVALID_VARIABLE.getDescription(), ex.getName()));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDTO);
     }
 

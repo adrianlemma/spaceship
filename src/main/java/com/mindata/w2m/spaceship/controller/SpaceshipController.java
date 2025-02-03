@@ -35,7 +35,7 @@ public class SpaceshipController {
 
     @GetMapping("/by-name/{name-part}")
     public ResponseEntity<Page<SpaceshipResponseDTO>> getSpaceshipsByNamePart(
-            @PathVariable String namePart, @PageableDefault(page = 0, size = 20) Pageable pageable) {
+            @PathVariable(value = "name-part") String namePart, @PageableDefault(page = 0, size = 20) Pageable pageable) {
         return ResponseEntity.ok(service.findSpaceshipsByNamePart(namePart, pageable));
     }
 
