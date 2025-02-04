@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mindata.w2m.spaceship.configuration.SecurityConfiguration;
 import com.mindata.w2m.spaceship.dto.SpaceshipRequestDTO;
 import com.mindata.w2m.spaceship.dto.SpaceshipResponseDTO;
+import com.mindata.w2m.spaceship.mq.ErrorLogProducer;
 import com.mindata.w2m.spaceship.service.SpaceshipService;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +37,9 @@ class SpaceshipControllerTest {
     @MockitoBean
     private SpaceshipService service;
 
+    @MockitoBean
+    private ErrorLogProducer logProducer;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -55,6 +59,7 @@ class SpaceshipControllerTest {
                         .param("size", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(1));
+        verifyNoInteractions(logProducer);
     }
 
     @Test

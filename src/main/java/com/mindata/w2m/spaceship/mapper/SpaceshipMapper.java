@@ -13,10 +13,6 @@ public interface SpaceshipMapper {
 
     Spaceship spaceshipRequestDtoTOSpaceship(SpaceshipRequestDTO spaceshipRequestDTO);
 
-    Spaceship spaceshipResponseDtoTOSpaceship(SpaceshipResponseDTO spaceshipResponseDTO);
-
-    SpaceshipRequestDTO spaceshipToSpaceshipRequestDto(Spaceship spaceship);
-
     SpaceshipResponseDTO spaceshipToSpaceshipResponseDto(Spaceship spaceship);
 
 }

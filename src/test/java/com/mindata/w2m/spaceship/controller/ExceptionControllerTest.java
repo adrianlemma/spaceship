@@ -2,9 +2,11 @@ package com.mindata.w2m.spaceship.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mindata.w2m.spaceship.configuration.SecurityConfiguration;
+import com.mindata.w2m.spaceship.dto.SpaceshipErrorDTO;
 import com.mindata.w2m.spaceship.dto.SpaceshipRequestDTO;
 import com.mindata.w2m.spaceship.exception.SpaceshipDuplicatedException;
 import com.mindata.w2m.spaceship.exception.SpaceshipNotFoundException;
+import com.mindata.w2m.spaceship.mq.ErrorLogProducer;
 import com.mindata.w2m.spaceship.service.SpaceshipService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,8 +25,7 @@ import static com.mindata.w2m.spaceship.constant.ErrorEnum.GENERIC_EXCEPTION;
 import static com.mindata.w2m.spaceship.mock.MockData.mockSpaceshipRequest;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -35,6 +36,9 @@ class ExceptionControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockitoBean
+    private ErrorLogProducer logProducer;
 
     @MockitoBean
     private SpaceshipService service;
@@ -57,6 +61,7 @@ class ExceptionControllerTest {
         mockMvc.perform(get("/spaceships/1"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error_code").value(NOT_FOUND_BY_ID.getCode()));
+        verify(logProducer).sendMessage(any(SpaceshipErrorDTO.class));
     }
 
     @Test
