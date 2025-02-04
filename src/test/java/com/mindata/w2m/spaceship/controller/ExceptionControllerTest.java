@@ -1,6 +1,7 @@
 package com.mindata.w2m.spaceship.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mindata.w2m.spaceship.configuration.SecurityConfiguration;
 import com.mindata.w2m.spaceship.dto.SpaceshipRequestDTO;
 import com.mindata.w2m.spaceship.exception.SpaceshipDuplicatedException;
 import com.mindata.w2m.spaceship.exception.SpaceshipNotFoundException;
@@ -11,7 +12,9 @@ import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -27,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest
+@Import(SecurityConfiguration.class)
 class ExceptionControllerTest {
 
     @Autowired
@@ -56,6 +60,7 @@ class ExceptionControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "test_user", roles = {"TEST_USER"})
     void spaceshipDuplicatedExceptionHandler() throws Exception {
         when(service.saveSpaceship(any(SpaceshipRequestDTO.class)))
                 .thenThrow(new SpaceshipDuplicatedException(DUPLICATED_SPACESHIP.getCode(), DUPLICATED_SPACESHIP.getDescription()));
@@ -68,6 +73,7 @@ class ExceptionControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "test_user", roles = {"TEST_USER"})
     void handleValidationExceptions() throws Exception {
         SpaceshipRequestDTO illegalRequest = mockSpaceshipRequest();
         illegalRequest.setSpaceshipName(null);
@@ -87,6 +93,7 @@ class ExceptionControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "test_admin", roles = {"TEST_ADMIN"})
     void genericExceptionHandler() throws Exception {
         doThrow(RuntimeException.class).when(service).deleteSpaceshipById(eq(1L));
         mockMvc.perform(delete("/spaceships/1"))

@@ -1,16 +1,18 @@
 package com.mindata.w2m.spaceship.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mindata.w2m.spaceship.configuration.SecurityConfiguration;
 import com.mindata.w2m.spaceship.dto.SpaceshipRequestDTO;
 import com.mindata.w2m.spaceship.dto.SpaceshipResponseDTO;
 import com.mindata.w2m.spaceship.service.SpaceshipService;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest
+@Import(SecurityConfiguration.class)
 class SpaceshipControllerTest {
 
     @Autowired
@@ -32,9 +35,6 @@ class SpaceshipControllerTest {
 
     @MockitoBean
     private SpaceshipService service;
-
-    @InjectMocks
-    private SpaceshipController controller;
 
     @BeforeEach
     void setUp() {
@@ -81,6 +81,7 @@ class SpaceshipControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "test_user", roles = {"TEST_USER"})
     void saveSpaceship() throws Exception {
         when(service.saveSpaceship(any(SpaceshipRequestDTO.class))).thenReturn(mockSpaceshipResponse());
 
@@ -92,6 +93,7 @@ class SpaceshipControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "test_user", roles = {"TEST_USER"})
     void updateSpaceship() throws Exception {
         when(service.updateSpaceship(eq(1L), any(SpaceshipRequestDTO.class))).thenReturn(mockSpaceshipResponse());
 
@@ -103,6 +105,7 @@ class SpaceshipControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "test_admin", roles = {"TEST_ADMIN"})
     void deleteSpaceship() throws Exception {
         mockMvc.perform(delete("/spaceships/1"))
                 .andExpect(status().isOk());

@@ -48,5 +48,5 @@ VALUES
 ('Ebon Hawk', 'Star Wars', 8, '2024-02-04 11:30:00'),
 ('Starlight Intruder', 'Dirty Pair', 10, '2024-02-04 12:00:00'),
 ('Pillar of Autumn', 'Halo', 3000, '2024-02-04 12:30:00'),
-('UNSC Infinity', 'Halo', 17000, '2024-02-04 13:00:00');
-('Astro Megaship', 'Power Rangers', 7, '2024-01-01 13:45:00')
+('UNSC Infinity', 'Halo', 17000, '2024-02-04 13:00:00'),
+('Astro Megaship', 'Power Rangers', 7, '2024-01-01 13:45:00');
