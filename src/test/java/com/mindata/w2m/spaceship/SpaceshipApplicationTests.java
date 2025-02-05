@@ -8,6 +8,7 @@ class SpaceshipApplicationTests {
 
 	@Test
 	void contextLoads() {
+		SpaceshipApplication.main(new String[] {});
 	}
 
 }
