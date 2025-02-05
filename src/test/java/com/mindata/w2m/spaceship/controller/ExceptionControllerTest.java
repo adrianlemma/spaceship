@@ -106,4 +106,21 @@ class ExceptionControllerTest {
                 .andExpect(jsonPath("$.error_code").value(GENERIC_EXCEPTION.getCode()));
     }
 
+    @Test
+    void testUnauthorizedException() throws Exception {
+        mockMvc.perform(delete("/spaceships/1"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error_code").value(UNAUTHORIZED_ERROR.getCode()));
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    @WithMockUser(username = "test_user", roles = {"TEST_USER"})
+    void testForbiddenException() throws Exception {
+        mockMvc.perform(delete("/spaceships/1"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error_code").value(FORBIDDEN_ERROR.getCode()));
+        verifyNoInteractions(service);
+    }
+
 }
